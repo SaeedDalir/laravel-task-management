@@ -63,7 +63,13 @@ Configure PostgreSQL, Redis and JWT values in `.env`.
 docker-compose up -d
 ```
 
-3. Run migrations, generate app key and JWT secret inside the container:
+3. Install PHP dependencies inside the app container:
+
+```bash
+docker-compose exec app composer install
+```
+
+4. Run migrations, generate app key and JWT secret inside the container:
 
 ```bash
 docker-compose exec app php artisan key:generate
