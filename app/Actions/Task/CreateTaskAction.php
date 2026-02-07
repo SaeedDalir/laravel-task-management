@@ -25,6 +25,7 @@ class CreateTaskAction
         $assignedUserIds = $request->validated('assigned_user_ids') ?? [];
         if ($assignedUserIds !== []) {
             $task->users()->sync($assignedUserIds);
+            $task->touch();
         }
 
         event(new ActivityOccurred(

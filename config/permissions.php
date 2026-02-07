@@ -7,5 +7,7 @@ return [
         'create_task',
         'update_task',
         'delete_task',
+        'view_users',
+        'update_users',
     ],
 ];

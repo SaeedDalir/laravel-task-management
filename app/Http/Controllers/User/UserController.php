@@ -9,19 +9,22 @@ use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\Response;
 
 class UserController extends BaseController
 {
+    public function __construct(private readonly CacheService $cacheService)
+    {
+        parent::__construct();
+    }
+
     public function index()
     {
         $page = (int) request('page', 1);
         $size = (int) request('size', 15);
 
-        $cacheKey = "users:index:page:{$page}:size:{$size}";
-
-        $data = Cache::store('redis')->remember($cacheKey, 60, function () {
+        $data = $this->cacheService->rememberUserIndex($page, $size, function () {
             $users = User::orderBy('id')->paginateWithSize();
 
             return \format_pagination(UserResource::collection($users));
@@ -35,9 +38,7 @@ class UserController extends BaseController
 
     public function show(User $user)
     {
-        $cacheKey = "users:show:{$user->id}";
-
-        $data = Cache::store('redis')->remember($cacheKey, 60, function () use ($user) {
+        $data = $this->cacheService->rememberUserShow($user, function () use ($user) {
             return UserResource::make($user)->resolve();
         });
 

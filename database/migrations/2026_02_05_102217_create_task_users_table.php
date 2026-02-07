@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('task_users', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('task_id')->unique();
-            $table->foreignId('user_id')->unique();
+            $table->foreignId('task_id');
+            $table->foreignId('user_id');
+
+            $table->unique(['task_id', 'user_id']);
 
             $table->softDeletes();
             $table->timestamps();
