@@ -14,30 +14,30 @@ class CacheService
     {
         $cacheKey = "tasks:index:user:{$user->id}:page:{$page}:size:{$size}:filter:".md5(json_encode($filters));
 
-        return Cache::store('redis')->tags(['tasks', "tasks:user:{$user->id}"])->remember($cacheKey, self::TTL_DAY, $callback);
+        return Cache::tags(['tasks', "tasks:user:{$user->id}"])->remember($cacheKey, self::TTL_DAY, $callback);
     }
 
     public function rememberUserIndex(int $page, int $size, Closure $callback): array
     {
         $cacheKey = "users:index:page:{$page}:size:{$size}";
 
-        return Cache::store('redis')->tags(['users'])->remember($cacheKey, self::TTL_DAY, $callback);
+        return Cache::tags(['users'])->remember($cacheKey, self::TTL_DAY, $callback);
     }
 
     public function rememberUserShow(User $user, Closure $callback): array
     {
         $cacheKey = "users:show:{$user->id}";
 
-        return Cache::store('redis')->tags(['users', "users:show:{$user->id}"])->remember($cacheKey, self::TTL_DAY, $callback);
+        return Cache::tags(['users', "users:show:{$user->id}"])->remember($cacheKey, self::TTL_DAY, $callback);
     }
 
     public function invalidateTaskCaches(): void
     {
-        Cache::store('redis')->tags(['tasks'])->flush();
+        Cache::tags(['tasks'])->flush();
     }
 
     public function invalidateUserCaches(): void
     {
-        Cache::store('redis')->tags(['users'])->flush();
+        Cache::tags(['users'])->flush();
     }
 }
