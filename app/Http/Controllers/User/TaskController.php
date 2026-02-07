@@ -11,12 +11,17 @@ use App\Http\Requests\Task\TaskUpdateRequest;
 use App\Http\Requests\Task\TaskUpdateStatusRequest;
 use App\Http\Resources\Task\TaskResource;
 use App\Models\Task;
+use App\Services\CacheService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 
 class TaskController extends BaseController
 {
+    public function __construct(private readonly CacheService $cacheService)
+    {
+        parent::__construct();
+    }
+
     public function index()
     {
         /** @var \App\Models\User $user */
@@ -26,10 +31,7 @@ class TaskController extends BaseController
         $page = (int) request('page', 1);
         $size = (int) request('size', 15);
 
-        $cacheKey = 'tasks:index:user:'.$user->id
-            .":page:{$page}:size:{$size}:filter:".md5(json_encode($filters));
-
-        $data = Cache::store('redis')->remember($cacheKey, 60, function () use ($user, $filters) {
+        $data = $this->cacheService->rememberTaskIndex($user, $page, $size, $filters, function () use ($user, $filters) {
             $tasks = Task::visibleFor($user)
                 ->filter($filters)
                 ->orderByDesc('id')
@@ -77,4 +79,3 @@ class TaskController extends BaseController
         return Response::success(message: '', data: null);
     }
 }
-

@@ -27,6 +27,7 @@ class UpdateTaskAction
 
         if ($assignedUserIds !== null) {
             $task->users()->sync($assignedUserIds);
+            $task->touch();
         }
 
         $after = [
